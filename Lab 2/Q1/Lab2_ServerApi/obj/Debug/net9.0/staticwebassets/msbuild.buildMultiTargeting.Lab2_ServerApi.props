@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Lab2_ServerApi.props" />
+</Project>
