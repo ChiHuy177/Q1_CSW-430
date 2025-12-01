@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthService } from '../services/AuthService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface LoginScreenProps {
   setIsLoggedIn: (value: boolean) => void;
@@ -31,9 +30,7 @@ export default function LoginScreen({ setIsLoggedIn }: LoginScreenProps) {
       return;
     }
     try {
-      const response = await AuthService.login(phone, password);
-      AsyncStorage.setItem('token', response.token);
-      AsyncStorage.setItem('userName', response.name);
+      await AuthService.login(phone, password);
       setIsLoggedIn(true);
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);

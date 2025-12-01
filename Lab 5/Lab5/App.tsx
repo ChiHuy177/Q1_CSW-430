@@ -8,11 +8,22 @@ import { Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { useState } from 'react';
 import ServicesScreen, { Service } from './src/pages/ServiceScreen';
-import { House, LayoutGrid, Settings, Users } from 'lucide-react-native';
+import {
+  BadgeDollarSign,
+  House,
+  LayoutGrid,
+  Settings,
+  Users,
+} from 'lucide-react-native';
 import ServiceDetailScreen from './src/pages/ServiceDetailScreen';
 import CreateServiceScreen from './src/pages/AddNewScreen';
 import { MenuProvider } from 'react-native-popup-menu';
 import EditServiceScreen from './src/pages/EditServiceScreen';
+import CustomersScreen, { Customer } from './src/pages/CustomerScreen';
+import CreateCustomerScreen from './src/pages/AddNewCustomerScreen';
+import TransactionScreen from './src/pages/TransactionScreen';
+import TransactionScreenDetail from './src/pages/TransactionScreenDetail';
+import SettingsScreen from './src/pages/SettingsScreen';
 
 type RootStackParamList = {
   Login: undefined;
@@ -21,8 +32,8 @@ type RootStackParamList = {
 
 type TabParamList = {
   Home: undefined;
-  Services: undefined;
-  Profile: undefined;
+  Transaction: undefined;
+  Customer: undefined;
   Settings: undefined;
 };
 
@@ -33,9 +44,63 @@ export type ServicesStackParamList = {
   EditService: { service: any };
 };
 
+export type CustomerStackParamList = {
+  CustomerList: undefined;
+  AddNewCustomer: undefined;
+};
+
+export type TransactionStackParamList = {
+  TransactionList: undefined;
+  TransactionDetail: { transactionId: string };
+};
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 const ServicesStack = createNativeStackNavigator<ServicesStackParamList>();
+const CustomerStack = createNativeStackNavigator<CustomerStackParamList>();
+const TransactionStack =
+  createNativeStackNavigator<TransactionStackParamList>();
+
+function TransactionStackNavigator() {
+  return (
+    <TransactionStack.Navigator screenOptions={{ headerShown: false }}>
+      <TransactionStack.Screen
+        name="TransactionList"
+        component={TransactionScreen}
+      />
+      <TransactionStack.Screen
+        name="TransactionDetail"
+        component={TransactionScreenDetail}
+        options={{
+          headerShown: true,
+          headerTitle: 'Chi tiết giao dịch',
+          headerStyle: { backgroundColor: '#e91e63' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      />
+    </TransactionStack.Navigator>
+  );
+}
+
+function CustomerStackNavigator() {
+  return (
+    <CustomerStack.Navigator screenOptions={{ headerShown: false }}>
+      <CustomerStack.Screen name="CustomerList" component={CustomersScreen} />
+      <CustomerStack.Screen
+        name="AddNewCustomer"
+        component={CreateCustomerScreen}
+        options={{
+          headerShown: true,
+          headerTitle: 'Thêm mới khách hàng',
+          headerStyle: { backgroundColor: '#e91e63' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      />
+    </CustomerStack.Navigator>
+  );
+}
 
 function ServicesStackNavigator() {
   return (
@@ -65,7 +130,7 @@ function ServicesStackNavigator() {
       />
       <ServicesStack.Screen
         name="EditService"
-        component={EditServiceScreen} 
+        component={EditServiceScreen}
         options={{
           headerShown: true,
           headerTitle: 'Chỉnh sửa dịch vụ',
@@ -78,7 +143,7 @@ function ServicesStackNavigator() {
   );
 }
 
-function TabNavigator() {
+function TabNavigator({ setIsLoggedIn }: { setIsLoggedIn: (value: boolean) => void }) {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -101,24 +166,24 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Services"
-        component={ServicesStackNavigator}
+        name="Transaction"
+        component={TransactionStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Dịch vụ',
+          tabBarLabel: 'Transaction',
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 20 }}>
-              <LayoutGrid />
+              <BadgeDollarSign />
             </Text>
           ),
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ServicesScreen}
+        name="Customer"
+        component={CustomerStackNavigator}
         options={{
           headerShown: false,
-          tabBarLabel: 'Cá nhân',
+          tabBarLabel: 'Khách hàng',
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 20 }}>
               <Users />
@@ -128,7 +193,6 @@ function TabNavigator() {
       />
       <Tab.Screen
         name="Settings"
-        component={ServicesScreen}
         options={{
           headerShown: false,
           tabBarLabel: 'Cài đặt',
@@ -138,7 +202,9 @@ function TabNavigator() {
             </Text>
           ),
         }}
-      />
+      >
+        {props => <SettingsScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
@@ -157,7 +223,9 @@ function App() {
             </Stack.Screen>
           ) : (
             <>
-              <Stack.Screen name="Main" component={TabNavigator} />
+              <Stack.Screen name="Main">
+                {props => <TabNavigator {...props} setIsLoggedIn={setIsLoggedIn} />}
+              </Stack.Screen>
             </>
           )}
         </Stack.Navigator>
