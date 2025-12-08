@@ -22,6 +22,7 @@ export interface Service {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  quantity?: number;
 }
 
 type NavigationProp = NativeStackNavigationProp<
@@ -83,7 +84,9 @@ export default function ServicesScreen() {
               <Text style={styles.sectionTitle}>Dịch vụ có sẵn</Text>
               <View style={{ marginRight: 5 }}>
                 <TouchableOpacity
-                  onPress={() => {navigation.navigate('AddNewService')}}
+                  onPress={() => {
+                    navigation.navigate('AddNewService');
+                  }}
                   style={{
                     backgroundColor: '#007AFF',
                     paddingVertical: 10,

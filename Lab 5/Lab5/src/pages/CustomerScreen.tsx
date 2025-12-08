@@ -93,22 +93,31 @@ export default function CustomersScreen() {
             </View>
 
             {customers.map((customer, index) => (
-              <View style={styles.serviceCard} key={index}>
-                <View style={styles.serviceContent}>
-                  <View style={styles.serviceInfo}>
-                    <Text style={styles.serviceName}>
-                      Tên khách hàng: {customer.name}
-                    </Text>
-                    <Text style={styles.serviceName}>
-                      Số điện thoại: {customer.phone}
-                    </Text>
-                    <Text style={styles.servicePrice}>
-                      Tổng chi tiêu:{' '}
-                      {customer.totalSpent.toLocaleString('vi-VN')}đ
-                    </Text>
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  navigation.navigate('CustomerDetail', {
+                    customerId: customer._id,
+                  });
+                }}
+              >
+                <View style={styles.serviceCard}>
+                  <View style={styles.serviceContent}>
+                    <View style={styles.serviceInfo}>
+                      <Text style={styles.serviceName}>
+                        Tên khách hàng: {customer.name}
+                      </Text>
+                      <Text style={styles.serviceName}>
+                        Số điện thoại: {customer.phone}
+                      </Text>
+                      <Text style={styles.servicePrice}>
+                        Tổng chi tiêu:{' '}
+                        {customer.totalSpent.toLocaleString('vi-VN')}đ
+                      </Text>
+                    </View>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </ScrollView>

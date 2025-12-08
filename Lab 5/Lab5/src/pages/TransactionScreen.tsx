@@ -86,6 +86,20 @@ export default function TransactionScreen({
           <View style={styles.servicesSection}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Transaction</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AddTransaction')}
+                style={{
+                  backgroundColor: '#007AFF',
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  borderRadius: 50,
+                  marginRight: 10,
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '600' }}>
+                  Thêm mới
+                </Text>
+              </TouchableOpacity>
               <View style={styles.countBadge}>
                 <Text style={styles.countText}>{transactions.length}</Text>
               </View>

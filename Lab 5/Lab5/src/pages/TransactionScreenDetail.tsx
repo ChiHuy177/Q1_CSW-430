@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -9,20 +9,89 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { TransactionService } from '../services/TransactionService';
 import { Transaction } from './TransactionScreen';
+import {
+  Menu,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
+import { TransactionStackParamList } from '../../App';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type TransactionDetailRouteProp = RouteProp<
   { TransactionDetail: { transactionId: string } },
   'TransactionDetail'
 >;
-
+type NavigationProp = NativeStackNavigationProp<
+  TransactionStackParamList,
+  'TransactionDetail'
+>;
+const HeaderMenu = ({ onDelete }: { onDelete: () => void }) => (
+  <Menu>
+    <MenuTrigger>
+      <View style={styles.headerMenuButton}>
+        <Text style={styles.headerMenuIcon}>⋮</Text>
+      </View>
+    </MenuTrigger>
+    <MenuOptions customStyles={menuStyles}>
+      <MenuOption onSelect={onDelete}>
+        <Text style={[styles.menuOptionText, { color: '#e74c3c' }]}>
+          Xóa transaction
+        </Text>
+      </MenuOption>
+    </MenuOptions>
+  </Menu>
+);
+const menuStyles = {
+  optionsContainer: {
+    padding: 5,
+    borderRadius: 8,
+  },
+  optionWrapper: {
+    padding: 10,
+  },
+};
 export default function TransactionScreenDetail() {
+  const navigation = useNavigation<NavigationProp>();
   const route = useRoute<TransactionDetailRouteProp>();
   const { transactionId } = route.params;
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useLayoutEffect(() => {
+    const handleDelete = () => {
+      Alert.alert(
+        'Xác nhận xóa',
+        `Bạn có chắc chắn muốn xóa transaction: "${transaction?.id}"?`,
+        [
+          {
+            text: 'Hủy',
+            style: 'cancel',
+          },
+          {
+            text: 'Xóa',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await TransactionService.deleteTransaction(transactionId);
+                Alert.alert('Thành công', 'Đã xóa khách hàng');
+                navigation.goBack();
+              } catch (error) {
+                Alert.alert('Lỗi', error.message || 'Không thể xóa khách hàng');
+              }
+            },
+          },
+        ],
+      );
+    };
+
+    navigation.setOptions({
+      headerRight: () => <HeaderMenu onDelete={handleDelete} />,
+    });
+  }, [navigation, transaction?.id, transactionId]);
 
   useEffect(() => {
     const fetchTransactionDetail = async () => {
@@ -137,7 +206,10 @@ export default function TransactionScreenDetail() {
             <View style={styles.priceRow}>
               <Text style={styles.priceLabel}>Giảm giá</Text>
               <Text style={[styles.priceValue, { color: '#27ae60' }]}>
-                -{formatCurrency(transaction.priceBeforePromotion - transaction.price)}
+                -
+                {formatCurrency(
+                  transaction.priceBeforePromotion - transaction.price,
+                )}
               </Text>
             </View>
           )}
@@ -173,7 +245,6 @@ export default function TransactionScreenDetail() {
 
           {transaction.services.map((service, index) => (
             <View key={service._id} style={styles.serviceItem}>
-
               <View style={styles.serviceDetails}>
                 <Text style={styles.serviceName}>{service.name}</Text>
                 <Text style={styles.servicePrice}>
@@ -193,9 +264,7 @@ export default function TransactionScreenDetail() {
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Người tạo</Text>
-            <Text style={styles.detailValue}>
-              {transaction.createdBy.name}
-            </Text>
+            <Text style={styles.detailValue}>{transaction.createdBy.name}</Text>
           </View>
 
           <View style={styles.detailRow}>
@@ -390,5 +459,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 62,
     right: 0,
+  },
+  headerMenuButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+  headerMenuIcon: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  menuOptionText: {
+    fontSize: 16,
+    paddingVertical: 5,
   },
 });
