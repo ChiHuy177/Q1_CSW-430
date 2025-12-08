@@ -24,6 +24,9 @@ import CreateCustomerScreen from './src/pages/AddNewCustomerScreen';
 import TransactionScreen from './src/pages/TransactionScreen';
 import TransactionScreenDetail from './src/pages/TransactionScreenDetail';
 import SettingsScreen from './src/pages/SettingsScreen';
+import CustomerDetailScreen from './src/pages/CustomerDetailScreen';
+import EditCustomerScreen from './src/pages/EditCustomerScreen';
+import AddTransactionScreen from './src/pages/AddTransactionScreen';
 
 type RootStackParamList = {
   Login: undefined;
@@ -47,11 +50,14 @@ export type ServicesStackParamList = {
 export type CustomerStackParamList = {
   CustomerList: undefined;
   AddNewCustomer: undefined;
+  CustomerDetail: { customerId: string };
+  EditCustomer: { customerId: string };
 };
 
 export type TransactionStackParamList = {
   TransactionList: undefined;
   TransactionDetail: { transactionId: string };
+  AddTransaction: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -79,6 +85,17 @@ function TransactionStackNavigator() {
           headerTitleStyle: { fontWeight: 'bold' },
         }}
       />
+      <TransactionStack.Screen
+        name="AddTransaction"
+        component={AddTransactionScreen}
+        options={{
+          headerShown: true,
+          headerTitle: 'Thêm giao dịch',
+          headerStyle: { backgroundColor: '#e91e63' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      />
     </TransactionStack.Navigator>
   );
 }
@@ -96,6 +113,29 @@ function CustomerStackNavigator() {
           headerStyle: { backgroundColor: '#e91e63' },
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      />
+      <CustomerStack.Screen
+        name="CustomerDetail"
+        component={CustomerDetailScreen}
+        options={{
+          headerShown: true,
+          headerTitle: 'Chi tiết khách hàng',
+          headerStyle: { backgroundColor: '#e91e63' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      />
+      <CustomerStack.Screen
+        name="EditCustomer"
+        component={EditCustomerScreen}
+        options={{
+          headerShown: true,
+          title: 'Chỉnh sửa khách hàng',
+          headerStyle: {
+            backgroundColor: '#e91e63',
+          },
+          headerTintColor: '#fff',
         }}
       />
     </CustomerStack.Navigator>
@@ -143,7 +183,11 @@ function ServicesStackNavigator() {
   );
 }
 
-function TabNavigator({ setIsLoggedIn }: { setIsLoggedIn: (value: boolean) => void }) {
+function TabNavigator({
+  setIsLoggedIn,
+}: {
+  setIsLoggedIn: (value: boolean) => void;
+}) {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -224,7 +268,9 @@ function App() {
           ) : (
             <>
               <Stack.Screen name="Main">
-                {props => <TabNavigator {...props} setIsLoggedIn={setIsLoggedIn} />}
+                {props => (
+                  <TabNavigator {...props} setIsLoggedIn={setIsLoggedIn} />
+                )}
               </Stack.Screen>
             </>
           )}
